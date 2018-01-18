@@ -2,34 +2,37 @@
 % PITTARO Pietro
 clear all; close all; clc;
 
-% %Preset per test di sviluppo (files corti )
-% % Massimo disallineamento iniziale ammesso in sec
-% W_Ini = 12.5; % 12 sec
-% % Finestra Blocco avanzamento analisi allineamento in sec
-% W_Ava = 26; % 13; % 1 sec
-% % Finestra verifica sincronizzazione in sec
-% W_Ver = 10; % 10 sec
-% % Avanzamento Finestra Ricerca silenzio (spezzone estraneo)in sec
-% W_Ric = 1; % 1 sec
-% % Finestra Verifica deriva totale in sec (indietro a partire da fine file
-% meno  W_Ver per distanziarmi dal bordo)
-% W_Der = 10; % 10 sec
-
-%Preset per test caso studio
+%Preset per test di sviluppo (files corti )
 % Massimo disallineamento iniziale ammesso in sec
-W_Ini = 300;
+W_Ini = 12.5; % 12 sec
 % Finestra Blocco avanzamento analisi allineamento in sec
-W_Ava = 120; % 
+W_Ava = 30 % 13; % 1 sec
 % Finestra verifica sincronizzazione in sec
-W_Ver = 10; % 20 sec
-% Avanzamento Finestra Ricerca silenzio (spezzone estraneo) in sec
+W_Ver = 10; % 10 sec
+% Avanzamento Finestra Ricerca silenzio (spezzone estraneo)in sec
 W_Ric = 1; % 1 sec
-% % Finestra Verifica deriva totale in sec (indietro a partire da fine file
+% Finestra Verifica deriva totale in sec (indietro a partire da fine file
 % meno  W_Ver per distanziarmi dal bordo)
-W_Der = 20; % 20 sec
+W_Der = 10; % 10 sec
+
+% %Preset per test caso studio - Lezione EAD
+% % Massimo disallineamento iniziale ammesso in sec
+% W_Ini = 300;
+% % Finestra Blocco avanzamento analisi allineamento in sec
+% W_Ava = 120; % 
+% % Finestra verifica sincronizzazione in sec
+% W_Ver = 10; % 20 sec
+% % Avanzamento Finestra Ricerca silenzio (spezzone estraneo) in sec
+% W_Ric = 1; % 1 sec
+% % % Finestra Verifica deriva totale in sec (indietro a partire da fine file
+% % meno  W_Ver per distanziarmi dal bordo)
+% W_Der = 20; % 20 sec
 
 % Soglia "Perfetto" allineamento xCorr
-SogliaPal = 44;   % (1/100 sec.)
+SogliaPal = 441;   % (1/100 sec.)
+% Soglia "Perfetto" allineamento xCorr tra due frames successivi per
+% considerare il silenzio sicuramente precedenteamente 
+SogliaPalC = 44;   % (1/1000 sec.)
 % Soglia Deriva minima da correggere in conteggi
 SogliaDer = 10;  %   % Limite volutamente basso per test
 
@@ -38,10 +41,14 @@ SogliaDer = 10;  %   % Limite volutamente basso per test
 
 % Caso 1  - traccia Audio Micr con aggiunta di 3 sec iniziali di valore costante
     % Definizione nome file di Audio da Video
-%     nomeFileV = 'SyncIniAudioV312s-T.wav';
+    nomeFileV = 'SyncIniAudioV312s-T.wav';
     % Definizione nome file di Audio da "Mic"(cellulare)
-%     nomeFileM = 'SyncIniAudioM323s3T-t.wav';
+    nomeFileM = 'SyncIniAudioM323s3T-t.wav';
 
+%     %TMP Test
+%     nomeFileV = 'vTestValXcorr2.wav';
+%     nomeFileM = 'MTestValXcorr2.wav';
+      
 % Caso 2  - traccia Audio Video con aggiunta di 3 sec iniziali di valore costante
         % Definizione nome file di Audio da Video
 %        nomeFileV = 'SyncIniAudioV315s3T-T.wav';
@@ -50,9 +57,9 @@ SogliaDer = 10;  %   % Limite volutamente basso per test
  
 % Caso 3 - trace date dal Professore
     % Definizione nome file di Audio da Video
-    nomeFileV = 'AudioV_Lez.wav';
+%     nomeFileV = 'AudioV_Lez.wav';
     % Definizione nome file di Audio da "Mic"(cellulare)
-    nomeFileM = 'AudioM_Lez.wav';
+%     nomeFileM = 'AudioM_Lez.wav';
       
     [AudioV, fsAV] = audioread(nomeFileV);
     [AudioM, fsAM] = audioread(nomeFileM);
@@ -179,16 +186,6 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
     
    BlockNum = BlockNum +1;
    
-%    % Plot sezione di confronto   
-%     figure;
-%     hold on;
-%     plot (FrameV);
-%     plot (FrameM);
-%     legend('Frames di confronto');
-%     ylabel('Wave Amplitude');
-%     xlabel('Samples');
-%     grid on;
-%     hold off;
       
     % Azzero contatore inizio eventuale silenzio nel Frame mic attuale
     IniSilenzio = 0;
@@ -201,7 +198,17 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
    fprintf ('Video Block N=%3d\tOffset=%6d (%5.4fsec)\tfrom\t%8d (%5.4fsec)\tto\t%8d (%5.4fsec)\n',BlockNum,OffsetD,OffsetD/fsAV,IdxDV+W_Ava_Samples-W_Ver_Samples,(IdxDV+W_Ava_Samples-W_Ver_Samples)/fsAV,IdxDV+W_Ava_Samples-1,(IdxDV+W_Ava_Samples-1)/fsAV);
    fprintf ('Micro Block N=%3d\tOffset=%6d (%5.4fsec)\tfrom\t%8d (%5.4fsec)\tto\t%8d (%5.4fsec)\n',BlockNum,OffsetD,OffsetD/fsAV,IdxDM+W_Ava_Samples-W_Ver_Samples,(IdxDM+W_Ava_Samples-W_Ver_Samples)/fsAV,IdxDM+W_Ava_Samples-1,(IdxDM+W_Ava_Samples-1)/fsAV);
  
-   
+%      % Plot sezione di confronto   
+%     figure;
+%     hold on;
+%     plot (FrameV);
+%     plot (FrameM);
+%     legend('Xcorr=      ');
+%     ylabel('Wave Amplitude');
+%     xlabel('Samples');
+%     grid on;
+%     hold off;
+ 
    % Controllo se allineamento mantenuto 
    % IPOTESI traccia Microfono sempre più grande di quella Video
    % perchè inserimenti dei "silenzio" solo da microfono
@@ -228,7 +235,7 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
        OffsetD2 = VerAllin (FrameV,FrameM);
        fprintf ('Block N=%d \twith misalignment - Offset = %d and %d \n',BlockNum, OffsetD, OffsetD2);  
     
-       if (abs(OffsetD2 - OffsetD) > SogliaPal)  &&  (MemDisFineBlocco == 0)   
+       if (abs(OffsetD2 - OffsetD) > SogliaPalC)  &&  (MemDisFineBlocco == 0)   
            % Se non avevo già trovato "silenzio" nella finestra di confronto del blocco precedente
            % allora in questo caso "silenzio" presente nei due ultimi Frame
            % di questo blocco ( Potrebbe essere solo nell'ultimo o in entrambi)
@@ -237,12 +244,12 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
            % il disallineamento dell'ultimo frame del blocco 
                       
            MemDisFineBlocco = 1;    % Blocco con disallineamento al fondo
-           if abs(OffsetD) < SogliaPal
+           if abs(OffsetD2) < SogliaPal
                % penultimo Frame allineato quindi ritardo solo nell'ultimo
                % sposto la finestra del Blocco di un Frame indietro e riparto col ciclo 
                % Avrò il silenzio all'inizio del successivo blocco
                OffsetD = 0;
-               RiduciFrameW_Ver = 1;    % blocco da ridurre di 1 finestra di verifica
+               RiduciFrameW_Ver = 1.5;    % blocco da ridurre di 1 finestra di verifica
     
            else
                % Silenzio presente in entrambi => semplifico la gestione avendo ipotizzato un solo silenzio per blocco
@@ -268,7 +275,8 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
                BloccoM = AudioM(IdxDM : IdxDM + W_Ava_Samples -1);
              end
            
-           % [IniSilenzio TempoSilenzio] = RicSilenzio(BloccoV,BloccoM,abs(OffsetD),W_Ric_Samples);
+%            [IniSilenzio TrovatoSilenzio] = RicSilenzio(BloccoV,BloccoM,abs(OffsetD),W_Ric_Samples);
+   
                 % [IniSilenzio TempoSilenzio] = RicSilenzioZero(BloccoV,BloccoM,abs(OffsetD),W_Ric_Samples);
                 % IPOTESI "silenzio" = segnale al di sotto di una certa
                 % soglia (es. 0.01) in modo continuativo per metà della finestra individuata 
@@ -280,7 +288,7 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
            if TrovatoSilenzio == 0
                 IniSilenzio = 0;
                 fprintf ('ERROR MESSAGE: NOISE NOT IDENTIFIED \n');
-        %         exit();
+  
            else
                % Ricalcolo inizio silenzio rispetto al Frame non maggiorato
                 IniSilenzio = IniSilenzio - abs(OffsetD);
@@ -291,7 +299,7 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
                     % condizione non possibile. ricondotto a Noise non identificato
                     IniSilenzio = 0;
                     fprintf ('ERROR MESSAGE: NOISE NOT IDENTIFIED \n');
-        %         exit();
+ 
                 end
            end
            
@@ -314,12 +322,17 @@ while ( (IdxDV + W_Ava_Samples) < LenAudioV && (IdxDM + W_Ava_Samples) < LenAudi
    AudioSync(IdxOut:IdxOut+W_Ava_Samples-1) = BloccoOut;
    
    if MemDisFineBlocco > 0
-       % se disallineamento al fondo del Blocco modifico i puntatori per
-       % inglobarlo nel blocco successivo
-       IdxDV  = IdxDV  - RiduciFrameW_Ver * W_Ver_Samples; 
-       IdxDM  = IdxDM  - RiduciFrameW_Ver * W_Ver_Samples; 
-       IdxOut = IdxOut - RiduciFrameW_Ver * W_Ver_Samples; 
-       RiduciFrameW_Ver = 0;
+		   % se disallineamento al fondo del Blocco modifico i puntatori per
+		   % inglobarlo nel blocco successivo
+		   IdxDV  = IdxDV  - RiduciFrameW_Ver * W_Ver_Samples; 
+		   IdxDM  = IdxDM  - RiduciFrameW_Ver * W_Ver_Samples; 
+		   IdxOut = IdxOut - RiduciFrameW_Ver * W_Ver_Samples; 
+		   RiduciFrameW_Ver = 0;
+	   else
+		   % Anche se perfetto allineamento avanzo di 1 blocco meno una finestra di verifica
+		   IdxDV  = IdxDV  - W_Ver_Samples; 
+		   IdxDM  = IdxDM  - W_Ver_Samples; 
+		   IdxOut = IdxOut - W_Ver_Samples; 
    end
    
    IdxOut = IdxOut + W_Ava_Samples;         
